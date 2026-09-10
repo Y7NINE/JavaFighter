@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(javac -d bin -sourcepath src/main/java src/main/java/com/fighting/GameApp.java)",
+      "Bash(javac -d bin -sourcepath src/main/java src/main/java/com/fighting/system/LoginSystem.java src/main/java/com/fighting/system/TauntSystem.java)"
+    ]
+  }
+}
