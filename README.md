@@ -302,7 +302,7 @@ java -cp bin com.fighting.GameApp
 
 ## 👨‍💻 作者
 
-GitHub: [your-username](https://github.com/your-username)
+GitHub: [Y7NINE](https://github.com/Y7NINE)
 
 ---
 
