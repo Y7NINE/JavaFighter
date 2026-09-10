@@ -264,10 +264,9 @@ public abstract class Character {
     }
 
     /**
-     * 绘制角色（简单矩形版本）
+     * 绘制角色（带动画效果）
      */
     public void draw(Graphics2D g) {
-        // 计算绘制位置
         int drawX = (int) position.getX();
         int drawY = (int) position.getY();
 
@@ -275,31 +274,243 @@ public abstract class Character {
         if (isHit && hitStunFrames % 2 == 0) return;
         if (invincibleFrames > 0 && invincibleFrames % 3 == 0) return;
 
-        // 绘制角色身体
-        g.setColor(getColor());
-        g.fillRect(drawX, drawY, width, height);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // 绘制方向指示（眼睛）
+        // 保存原始颜色
+        Color bodyColor = getColor();
+
+        // 绘制阴影
+        g.setColor(new Color(0, 0, 0, 50));
+        g.fillOval(drawX + 10, Constants.GROUND_Y - 10, width - 20, 15);
+
+        // 根据状态绘制不同动画
+        if (isUsingSkill) {
+            drawAttackAnimation(g, drawX, drawY, bodyColor);
+        } else if (!onGround) {
+            drawJumpAnimation(g, drawX, drawY, bodyColor);
+        } else if (isMoving) {
+            drawMoveAnimation(g, drawX, drawY, bodyColor);
+        } else if (isDefending) {
+            drawDefendAnimation(g, drawX, drawY, bodyColor);
+        } else if (isDodging) {
+            drawDodgeAnimation(g, drawX, drawY, bodyColor);
+        } else {
+            drawIdleAnimation(g, drawX, drawY, bodyColor);
+        }
+    }
+
+    /**
+     * 待机动画
+     */
+    private void drawIdleAnimation(Graphics2D g, int x, int y, Color color) {
+        int bobOffset = (int) (Math.sin(animFrame * 0.2) * 3);
+
+        // 身体
+        g.setColor(color);
+        g.fillRoundRect(x + 15, y + 30 + bobOffset, 50, 55, 10, 10);
+
+        // 头
+        g.setColor(color.brighter());
+        g.fillOval(x + 20, y + bobOffset, 40, 35);
+
+        // 眼睛
         g.setColor(Color.WHITE);
-        int eyeX = facing == 1 ? drawX + width - 20 : drawX + 10;
-        g.fillOval(eyeX, drawY + 15, 10, 10);
+        int eyeX = facing == 1 ? x + 42 : x + 25;
+        g.fillOval(eyeX, y + 12 + bobOffset, 12, 12);
+        g.setColor(Color.BLACK);
+        g.fillOval(eyeX + 3, y + 15 + bobOffset, 6, 6);
 
-        // 防御状态指示
-        if (isDefending) {
-            g.setColor(new Color(100, 100, 255, 100));
-            g.fillRect(drawX - 5, drawY - 5, width + 10, height + 10);
+        // 腿
+        g.setColor(color.darker());
+        int legOffset = (int) (Math.sin(animFrame * 0.1) * 2);
+        g.fillRect(x + 20, y + 85, 15, 35 + legOffset);
+        g.fillRect(x + 45, y + 85, 15, 35 - legOffset);
+
+        // 手臂
+        g.setColor(color);
+        g.fillRect(x - 5, y + 40, 20, 12);
+        g.fillRect(x + 65, y + 40, 20, 12);
+    }
+
+    /**
+     * 移动动画
+     */
+    private void drawMoveAnimation(Graphics2D g, int x, int y, Color color) {
+        int legAnim = (animFrame % 4) * 5;
+
+        // 身体（略微前倾）
+        g.setColor(color);
+        g.fillRoundRect(x + 15, y + 30, 50, 55, 10, 10);
+
+        // 头
+        g.setColor(color.brighter());
+        g.fillOval(x + 20, y, 40, 35);
+
+        // 眼睛（看向前方）
+        g.setColor(Color.WHITE);
+        int eyeX = facing == 1 ? x + 45 : x + 22;
+        g.fillOval(eyeX, y + 12, 12, 12);
+        g.setColor(Color.BLACK);
+        int pupilX = facing == 1 ? eyeX + 4 : eyeX + 2;
+        g.fillOval(pupilX, y + 15, 5, 5);
+
+        // 腿（跑步动画）
+        g.setColor(color.darker());
+        g.fillRect(x + 20 - legAnim, y + 85, 15, 30);
+        g.fillRect(x + 45 + legAnim, y + 85, 15, 30);
+
+        // 手臂（摆动）
+        g.setColor(color);
+        g.fillRect(x - 10 + legAnim, y + 40, 25, 12);
+        g.fillRect(x + 65 - legAnim, y + 40, 25, 12);
+
+        // 移动粒子效果
+        g.setColor(new Color(255, 255, 255, 100));
+        for (int i = 0; i < 3; i++) {
+            int px = x + (facing == 1 ? -10 - i * 8 : width + 10 + i * 8);
+            int py = y + 50 + i * 15;
+            g.fillOval(px, py, 5 - i, 5 - i);
         }
+    }
 
-        // 技能使用指示
-        if (isUsingSkill && currentSkill != null) {
-            g.setColor(new Color(255, 255, 0, 150));
-            g.fillOval(drawX - 10, drawY - 10, width + 20, height + 20);
+    /**
+     * 跳跃动画
+     */
+    private void drawJumpAnimation(Graphics2D g, int x, int y, Color color) {
+        // 身体
+        g.setColor(color);
+        g.fillRoundRect(x + 15, y + 30, 50, 50, 10, 10);
+
+        // 头
+        g.setColor(color.brighter());
+        g.fillOval(x + 20, y, 40, 35);
+
+        // 眼睛（向下看）
+        g.setColor(Color.WHITE);
+        g.fillOval(x + 25, y + 18, 12, 12);
+        g.fillOval(x + 43, y + 18, 12, 12);
+        g.setColor(Color.BLACK);
+        g.fillOval(x + 28, y + 22, 6, 6);
+        g.fillOval(x + 46, y + 22, 6, 6);
+
+        // 腿（收缩）
+        g.setColor(color.darker());
+        g.fillRect(x + 25, y + 80, 12, 25);
+        g.fillRect(x + 43, y + 80, 12, 25);
+
+        // 手臂（上举）
+        g.setColor(color);
+        g.fillRect(x + 5, y + 20, 12, 25);
+        g.fillRect(x + 63, y + 20, 12, 25);
+    }
+
+    /**
+     * 攻击动画
+     */
+    private void drawAttackAnimation(Graphics2D g, int x, int y, Color color) {
+        int attackPhase = skillFrameCounter % 20;
+
+        // 身体（后仰）
+        g.setColor(color);
+        g.fillRoundRect(x + 15, y + 30, 50, 55, 10, 10);
+
+        // 头
+        g.setColor(color.brighter());
+        g.fillOval(x + 20, y, 40, 35);
+
+        // 眼睛（专注）
+        g.setColor(Color.WHITE);
+        int eyeX = facing == 1 ? x + 45 : x + 22;
+        g.fillOval(eyeX, y + 12, 12, 12);
+        g.setColor(new Color(255, 50, 50));
+        g.fillOval(eyeX + 3, y + 15, 6, 6);
+
+        // 腿（稳定）
+        g.setColor(color.darker());
+        g.fillRect(x + 20, y + 85, 15, 35);
+        g.fillRect(x + 45, y + 85, 15, 35);
+
+        // 攻击手臂（伸出）
+        g.setColor(color);
+        int armExtend = facing == 1 ? 30 + attackPhase : -30 - attackPhase;
+        g.fillRect(x + 60, y + 40, 30 + armExtend, 15);
+
+        // 攻击特效
+        if (currentSkill != null && attackPhase < 10) {
+            g.setColor(new Color(255, 255, 0, 200 - attackPhase * 20));
+            int effectX = facing == 1 ? x + width + attackPhase * 5 : x - 30 - attackPhase * 5;
+            g.fillOval(effectX, y + 35, 25, 25);
+
+            // 技能名称显示
+            g.setColor(new Color(255, 255, 255, 255 - attackPhase * 25));
+            g.setFont(new Font("Microsoft YaHei", Font.BOLD, 14));
+            g.drawString(currentSkill.getName(), x + 20, y - 20);
         }
+    }
 
-        // 闪避状态指示
-        if (isDodging) {
-            g.setColor(new Color(200, 200, 200, 100));
-            g.fillRect(drawX, drawY, width, height);
+    /**
+     * 防御动画
+     */
+    private void drawDefendAnimation(Graphics2D g, int x, int y, Color color) {
+        // 身体（下蹲）
+        g.setColor(color);
+        g.fillRoundRect(x + 10, y + 40, 60, 50, 10, 10);
+
+        // 头
+        g.setColor(color.brighter());
+        g.fillOval(x + 20, y + 10, 40, 35);
+
+        // 眼睛（紧闭）
+        g.setColor(Color.WHITE);
+        g.fillRect(x + 25, y + 22, 10, 3);
+        g.fillRect(x + 45, y + 22, 10, 3);
+
+        // 腿（弯曲）
+        g.setColor(color.darker());
+        g.fillRect(x + 15, y + 90, 20, 25);
+        g.fillRect(x + 45, y + 90, 20, 25);
+
+        // 手臂（交叉防御）
+        g.setColor(color);
+        g.fillRect(x + 5, y + 45, 30, 15);
+        g.fillRect(x + 45, y + 45, 30, 15);
+
+        // 防御护盾
+        g.setColor(new Color(100, 150, 255, 150));
+        g.setStroke(new BasicStroke(3));
+        g.drawOval(x - 10, y - 10, width + 20, height + 20);
+    }
+
+    /**
+     * 闪避动画
+     */
+    private void drawDodgeAnimation(Graphics2D g, int x, int y, Color color) {
+        // 身体（残影效果）
+        g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 100));
+        g.fillRoundRect(x - facing * 20, y + 30, 50, 55, 10, 10);
+
+        // 当前身体
+        g.setColor(color);
+        g.fillRoundRect(x + 15, y + 30, 50, 55, 10, 10);
+
+        // 头
+        g.setColor(color.brighter());
+        g.fillOval(x + 20, y, 40, 35);
+
+        // 眼睛
+        g.setColor(Color.WHITE);
+        g.fillOval(x + 30, y + 12, 8, 8);
+
+        // 腿（快速移动）
+        g.setColor(color.darker());
+        g.fillRect(x + 20, y + 85, 15, 30);
+        g.fillRect(x + 45, y + 85, 15, 30);
+
+        // 闪避轨迹
+        g.setColor(new Color(200, 200, 255, 150));
+        for (int i = 0; i < 5; i++) {
+            int trailX = x - facing * (i * 15);
+            g.fillOval(trailX + 30, y + 50, 20 - i * 3, 20 - i * 3);
         }
     }
 
