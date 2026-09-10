@@ -1,6 +1,7 @@
 package com.fighting.ui;
 
 import com.fighting.core.GameState;
+import com.fighting.core.InputHandler;
 import com.fighting.model.Character;
 import com.fighting.model.Player;
 import com.fighting.system.BattleSystem;
@@ -37,6 +38,8 @@ public class BattlePanel extends JPanel {
         setLayout(null); // 使用绝对布局
         setBackground(Constants.COLOR_BACKGROUND);
         setFocusable(true);
+        // 添加键盘监听器
+        addKeyListener(mainFrame.getInputHandler());
         initUI();
     }
 
