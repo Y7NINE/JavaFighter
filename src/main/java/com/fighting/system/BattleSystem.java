@@ -128,14 +128,16 @@ public class BattleSystem {
 
         Skill currentSkill = attacker.getCurrentSkill();
 
-        // 检查是否在生效帧
-        int totalFrames = currentSkill.getStartupFrames() + currentSkill.getActiveFrames();
-        int frameInSkill = currentSkill.getStartupFrames() + currentSkill.getActiveFrames() +
-                          currentSkill.getRecoveryFrames() - attacker.getCurrentSkill().getCurrentCooldown();
+        // 获取当前帧数
+        int frameCounter = attacker.getSkillFrameCounter();
+        int totalFrames = currentSkill.getStartupFrames() + currentSkill.getActiveFrames() + currentSkill.getRecoveryFrames();
 
-        // 只在生效帧检测碰撞
-        if (frameInSkill >= currentSkill.getStartupFrames() &&
-            frameInSkill < totalFrames) {
+        // 计算当前处于技能的哪个阶段
+        int elapsedFrames = totalFrames - frameCounter; // 已经过的帧数
+
+        // 只在生效帧（前摇之后，后摇之前）检测碰撞
+        if (elapsedFrames >= currentSkill.getStartupFrames() &&
+            elapsedFrames < currentSkill.getStartupFrames() + currentSkill.getActiveFrames()) {
 
             if (CollisionDetector.checkAttackHit(attacker, defender)) {
                 // 计算伤害
@@ -159,8 +161,18 @@ public class BattleSystem {
                 if (attacker instanceof Assassin && currentSkill.isUltimate()) {
                     ((Assassin) attacker).backstab(defender);
                 }
+
+                // 触发屏幕震动
+                triggerShake();
             }
         }
+    }
+
+    /**
+     * 触发屏幕震动
+     */
+    private void triggerShake() {
+        // 这个方法会在BattlePanel中实现
     }
 
     /**

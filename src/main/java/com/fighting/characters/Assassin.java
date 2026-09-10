@@ -20,16 +20,16 @@ public class Assassin extends Character {
     @Override
     protected void initSkills() {
         // 技能1：劈
-        skills.add(new Skill("劈", "快速劈砍", 40, 300, 70, 3, 5, 8, false, false));
+        skills.add(new Skill("劈", "快速劈砍", 40, 300, 140, 3, 5, 8, false, false));
 
         // 技能2：跳劈
-        skills.add(new Skill("跳劈", "跳跃劈砍", 50, 420, 90, 5, 8, 12, false, false));
+        skills.add(new Skill("跳劈", "跳跃劈砍", 50, 420, 160, 5, 8, 12, false, false));
 
         // 技能3：影袭
         skills.add(new Skill("影袭", "快速位移", 0, 480, 0, 2, 12, 5, false, false));
 
         // 技能4：大招
-        skills.add(new Skill("背刺", "闪现到对手背后造成100伤害", 100, 1800, 0, 5, 3, 15, true, false));
+        skills.add(new Skill("背刺", "闪现到对手背后造成100伤害", 100, 1800, 200, 5, 3, 15, true, false));
     }
 
     @Override

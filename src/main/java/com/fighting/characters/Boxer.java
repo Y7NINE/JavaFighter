@@ -20,16 +20,16 @@ public class Boxer extends Character {
     @Override
     protected void initSkills() {
         // 技能1：刺拳
-        skills.add(new Skill("刺拳", "快速刺拳", 30, 240, 60, 2, 4, 6, false, false));
+        skills.add(new Skill("刺拳", "快速刺拳", 30, 240, 120, 2, 4, 6, false, false));
 
         // 技能2：重拳
-        skills.add(new Skill("重拳", "重拳出击", 50, 420, 80, 6, 5, 14, false, false));
+        skills.add(new Skill("重拳", "重拳出击", 50, 420, 150, 6, 5, 14, false, false));
 
         // 技能3：格挡
         skills.add(new Skill("格挡", "格挡攻击", 0, 480, 0, 3, 20, 5, false, false));
 
         // 技能4：大招
-        skills.add(new Skill("暴风连拳", "180伤害+回血60", 180, 1800, 100, 8, 20, 15, true, false));
+        skills.add(new Skill("暴风连拳", "180伤害+回血60", 180, 1800, 180, 8, 20, 15, true, false));
     }
 
     @Override

@@ -20,16 +20,16 @@ public class Swordsman extends Character {
     @Override
     protected void initSkills() {
         // 技能1：刺
-        skills.add(new Skill("刺", "快速刺击", 30, 300, 80, 3, 5, 8, false, false));
+        skills.add(new Skill("刺", "快速刺击", 30, 300, 150, 3, 5, 8, false, false));
 
         // 技能2：劈
-        skills.add(new Skill("劈", "重劈攻击", 40, 420, 100, 5, 5, 12, false, false));
+        skills.add(new Skill("劈", "重劈攻击", 40, 420, 180, 5, 5, 12, false, false));
 
         // 技能3：闪
         skills.add(new Skill("闪", "快速位移", 0, 480, 0, 2, 10, 5, false, false));
 
         // 技能4：大招
-        skills.add(new Skill("剑气纵横", "随机真伤150-300", 0, 1800, 150, 10, 15, 20, true, true));
+        skills.add(new Skill("剑气纵横", "随机真伤150-300", 0, 1800, 250, 10, 15, 20, true, true));
     }
 
     @Override

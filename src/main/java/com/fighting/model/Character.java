@@ -543,6 +543,7 @@ public abstract class Character {
     public int getWidth() { return width; }
     public int getHeight() { return height; }
     public int getFacing() { return facing; }
+    public int getSkillFrameCounter() { return skillFrameCounter; }
     public boolean isDead() { return isDead; }
     public boolean isDefending() { return isDefending; }
     public boolean isUsingSkill() { return isUsingSkill; }
